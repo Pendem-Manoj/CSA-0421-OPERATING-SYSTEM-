@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <string.h>
+
+typedef struct { int id; char name[20]; float sal; } Emp;
+
+int main(){
+    FILE *fp = fopen("emp.dat","wb+");
+    Emp e;
+    // write 3 employees
+    for(int i=0;i<3;i++){
+        e.id = i+1; sprintf(e.name, "Emp%d", e.id); e.sal = 1000 + i*500;
+        fwrite(&e, sizeof(Emp), 1, fp);
+    }
+    // random read: read record 2 (index 1)
+    fseek(fp, sizeof(Emp)*1, SEEK_SET);
+    fread(&e, sizeof(Emp), 1, fp);
+    printf("Read Emp: %d %s %.2f\n", e.id, e.name, e.sal);
+    // modify record 3
+    strcpy(e.name, "UpdatedEmp3"); e.sal = 9999;
+    fseek(fp, sizeof(Emp)*2, SEEK_SET);
+    fwrite(&e, sizeof(Emp), 1, fp);
+    fclose(fp);
+    return 0;
+}
