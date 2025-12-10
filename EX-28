@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <string.h>
+
+void first_fit(int blocks[], int b, int proc[], int p) {
+    int alloc[p]; memset(alloc, -1, sizeof(alloc));
+    for(int i=0;i<p;i++){
+        for(int j=0;j<b;j++){
+            if(blocks[j] >= proc[i]){ alloc[i]=j; blocks[j]-=proc[i]; break; }
+        }
+    }
+    printf("Process\tSize\tBlock\n");
+    for(int i=0;i<p;i++) printf("%d\t%d\t%s\n", i+1, proc[i], alloc[i]==-1?"Not Allocated":(char[]){0});
+}
+
+int find_best(int blocks[], int b, int size) {
+    int idx=-1, best=1<<30;
+    for(int i=0;i<b;i++) if(blocks[i]>=size && blocks[i]-size < best){ best = blocks[i]-size; idx=i; }
+    return idx;
+}
+int find_worst(int blocks[], int b, int size) {
+    int idx=-1, worst=-1;
+    for(int i=0;i<b;i++) if(blocks[i]>=size && blocks[i]-size > worst){ worst = blocks[i]-size; idx=i; }
+    return idx;
+}
+
+int main(){
+    // simple demo with arrays
+    int b = 5, p = 4;
+    int blocks1[] = {100, 500, 200, 300, 600};
+    int procs[] = {212, 417, 112, 426};
+    // First Fit
+    int blocks[5]; memcpy(blocks, blocks1, sizeof(blocks));
+    int alloc[p]; for(int i=0;i<p;i++) alloc[i]=-1;
+    for(int i=0;i<p;i++) for(int j=0;j<b;j++) if(blocks[j]>=procs[i]){ alloc[i]=j; blocks[j]-=procs[i]; break; }
+    printf("First Fit:\nProc\tSize\tBlock\n");
+    for(int i=0;i<p;i++) printf("%d\t%d\t%s\n", i+1, procs[i], alloc[i]==-1?"Not Allocated":"Allocated");
+    // Best Fit
+    memcpy(blocks, blocks1, sizeof(blocks));
+    for(int i=0;i<p;i++){ int idx=find_best(blocks,b,procs[i]); if(idx!=-1) blocks[idx]-=procs[i]; }
+    printf("Best Fit done (demo)\n");
+    // Worst Fit
+    memcpy(blocks, blocks1, sizeof(blocks));
+    for(int i=0;i<p;i++){ int idx=find_worst(blocks,b,procs[i]); if(idx!=-1) blocks[idx]-=procs[i]; }
+    printf("Worst Fit done (demo)\n");
+    return 0;
+}
